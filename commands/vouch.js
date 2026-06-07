@@ -82,22 +82,20 @@ export default {
     const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
     // User avatar
-    const avatarURL = interaction.user.displayAvatarURL({ size: 128 });
+    const avatarURL = interaction.user.displayAvatarURL({ size: 256 });
 
     // Create embed
     const embed = new EmbedBuilder()
-      .setTitle(`${resolvedServiceName} | Game Tools, Accounts & Currency`)
-      .setDescription('~ Trusted by Gamers Worldwide 🌍')
+      .setTitle(`${resolvedServiceName} Vouch`)
+      .setDescription(`${stars}\n\n${text}`)
       .setColor(color)
       .setThumbnail(avatarURL)
       .addFields(
-        { name: '', value: stars },
-        { name: 'Vouch:', value: text },
-        { name: 'Vouch N°:', value: `${vouchNumber}`, inline: true },
-        { name: 'Vouched by:', value: `<@${interaction.user.id}>`, inline: true },
-        { name: 'Vouched at:', value: `${date} ${time}`, inline: true }
+        { name: '# Vouch', value: `\`#${vouchNumber}\``, inline: true },
+        { name: 'Vouched by', value: `<@${interaction.user.id}>`, inline: true },
+        { name: 'Date', value: `${date}`, inline: true }
       )
-      .setFooter({ text: `Service provided by ${resolvedServiceName} • ${date} ${time}` })
+      .setFooter({ text: `ud.xyz Vouches • ${time}` })
       .setTimestamp();
 
     // Send to vouch channel
