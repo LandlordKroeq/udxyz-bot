@@ -17,11 +17,11 @@ for (const file of commandFiles) {
 
 const rest = new REST().setToken(process.env.DISCORD_TOKEN);
 
-console.log(`Registering ${commands.length} slash commands globally...`);
+console.log(`Registering ${commands.length} slash commands to guild...`);
 
 const data = await rest.put(
-  Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
+  Routes.applicationGuildCommands(process.env.DISCORD_CLIENT_ID, process.env.DISCORD_GUILD_ID),
   { body: commands }
 );
 
-console.log(`✅ Successfully registered ${data.length} application commands globally.`);
+console.log(`✅ Successfully registered ${data.length} guild commands (instant update).`);
