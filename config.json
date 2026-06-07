@@ -1,6 +1,8 @@
 {
   "ownerRole": "YOUR_OWNER_ROLE_ID",
   "vouchChannel": "1512790458869485660",
-  "allowedRoles": [],
+  "allowedRoles": [
+    "1512157714975952979"
+  ],
   "services": []
 }
