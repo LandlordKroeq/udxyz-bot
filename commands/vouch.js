@@ -42,6 +42,9 @@ export default {
   },
 
   async execute(interaction) {
+    // Claim the interaction immediately to prevent double-acknowledge errors
+    await interaction.deferReply({ ephemeral: true });
+
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
     const serviceName = interaction.options.getString('cheat');
     const rating = interaction.options.getInteger('rating');
@@ -53,19 +56,13 @@ export default {
     );
 
     if (!hasAllowedRole && interaction.user.id !== interaction.guild.ownerId) {
-      return interaction.reply({
-        content: '❌ You do not have permission to submit vouches.',
-        ephemeral: true
-      });
+      return interaction.editReply({ content: '❌ You do not have permission to submit vouches.' });
     }
 
     // Validate service exists (case-insensitive)
     const matchedService = config.services.find(s => s.name.toLowerCase() === serviceName?.toLowerCase());
     if (!matchedService) {
-      return interaction.reply({
-        content: `❌ **${serviceName}** is not a valid cheat. Please select one from the list.`,
-        ephemeral: true
-      });
+      return interaction.editReply({ content: `❌ **${serviceName}** is not a valid cheat. Please select one from the list.` });
     }
     const resolvedServiceName = matchedService.name;
 
@@ -120,9 +117,6 @@ export default {
     });
     fs.writeFileSync('./vouches.json', JSON.stringify(vouchData, null, 2));
 
-    await interaction.reply({
-      content: '✅ Your vouch has been submitted!',
-      ephemeral: true
-    });
+    await interaction.editReply({ content: '✅ Your vouch has been submitted!' });
   }
 };
