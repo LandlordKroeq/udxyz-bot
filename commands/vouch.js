@@ -29,7 +29,8 @@ export default {
 
   async autocomplete(interaction) {
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-    const focused = interaction.options.getFocused();
+    const focusedValue = interaction.options.getFocused();
+    const focused = String(focusedValue ?? '');
     const services = config.services.map(s => s.name);
     const filtered = services.filter(s =>
       s.toLowerCase().includes(focused.toLowerCase())
