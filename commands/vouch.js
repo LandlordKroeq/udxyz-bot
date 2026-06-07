@@ -57,19 +57,26 @@ export default {
     let vouchData = JSON.parse(fs.readFileSync('./vouches.json', 'utf8'));
     const vouchNumber = vouchData.vouches.length + 1;
 
-    // Create stars
-    const stars = '⭐'.repeat(rating);
+    // Create stars with empty slots
+    const stars = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
+
+    // Color based on rating
+    const color = rating >= 4 ? '#57F287' : rating === 3 ? '#FEE75C' : '#ED4245';
 
     // Format timestamp
     const now = new Date();
     const date = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
     const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
+    // User avatar
+    const avatarURL = interaction.user.displayAvatarURL({ size: 128 });
+
     // Create embed
     const embed = new EmbedBuilder()
       .setTitle(`${serviceName} | Game Tools, Accounts & Currency`)
       .setDescription('~ Trusted by Gamers Worldwide 🌍')
-      .setColor('#F73234')
+      .setColor(color)
+      .setThumbnail(avatarURL)
       .addFields(
         { name: '', value: stars },
         { name: 'Vouch:', value: text },
