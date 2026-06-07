@@ -12,10 +12,15 @@ export default {
         .setAutocomplete(true))
     .addIntegerOption(option =>
       option.setName('rating')
-        .setDescription('Star rating (1-5)')
+        .setDescription('Star rating')
         .setRequired(true)
-        .setMinValue(1)
-        .setMaxValue(5))
+        .addChoices(
+          { name: '⭐☆☆☆☆ — 1 star', value: 1 },
+          { name: '⭐⭐☆☆☆ — 2 stars', value: 2 },
+          { name: '⭐⭐⭐☆☆ — 3 stars', value: 3 },
+          { name: '⭐⭐⭐⭐☆ — 4 stars', value: 4 },
+          { name: '⭐⭐⭐⭐⭐ — 5 stars', value: 5 },
+        ))
     .addStringOption(option =>
       option.setName('text')
         .setDescription('Your vouch text/comment')
@@ -27,7 +32,7 @@ export default {
     const focused = interaction.options.getFocused();
     const services = config.services.map(s => s.name);
     const filtered = services.filter(s =>
-      s.toLowerCase().startsWith(focused.toLowerCase())
+      s.toLowerCase().includes(focused.toLowerCase())
     );
 
     await interaction.respond(
@@ -49,6 +54,15 @@ export default {
     if (!hasAllowedRole && interaction.user.id !== interaction.guild.ownerId) {
       return interaction.reply({
         content: '❌ You do not have permission to submit vouches.',
+        ephemeral: true
+      });
+    }
+
+    // Validate service exists
+    const serviceExists = config.services.some(s => s.name === serviceName);
+    if (!serviceExists) {
+      return interaction.reply({
+        content: `❌ **${serviceName}** is not a valid service. Please select one from the list.`,
         ephemeral: true
       });
     }
