@@ -29,7 +29,7 @@ export default {
 
   async autocomplete(interaction) {
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-    const focused = interaction.options.getFocused('cheat') ?? interaction.options.getFocused();
+    const focused = interaction.options.getFocused();
     const services = config.services.map(s => s.name);
     const filtered = services.filter(s =>
       s.toLowerCase().includes(focused.toLowerCase())
@@ -58,14 +58,15 @@ export default {
       });
     }
 
-    // Validate service exists
-    const serviceExists = config.services.some(s => s.name === serviceName);
-    if (!serviceExists) {
+    // Validate service exists (case-insensitive)
+    const matchedService = config.services.find(s => s.name.toLowerCase() === serviceName?.toLowerCase());
+    if (!matchedService) {
       return interaction.reply({
-        content: `❌ **${serviceName}** is not a valid service. Please select one from the list.`,
+        content: `❌ **${serviceName}** is not a valid cheat. Please select one from the list.`,
         ephemeral: true
       });
     }
+    const resolvedServiceName = matchedService.name;
 
     // Load vouches
     let vouchData = JSON.parse(fs.readFileSync('./vouches.json', 'utf8'));
@@ -87,7 +88,7 @@ export default {
 
     // Create embed
     const embed = new EmbedBuilder()
-      .setTitle(`${serviceName} | Game Tools, Accounts & Currency`)
+      .setTitle(`${resolvedServiceName} | Game Tools, Accounts & Currency`)
       .setDescription('~ Trusted by Gamers Worldwide 🌍')
       .setColor(color)
       .setThumbnail(avatarURL)
@@ -98,7 +99,7 @@ export default {
         { name: 'Vouched by:', value: `<@${interaction.user.id}>`, inline: true },
         { name: 'Vouched at:', value: `${date} ${time}`, inline: true }
       )
-      .setFooter({ text: `Service provided by ${serviceName} • ${date} ${time}` })
+      .setFooter({ text: `Service provided by ${resolvedServiceName} • ${date} ${time}` })
       .setTimestamp();
 
     // Send to vouch channel
@@ -110,7 +111,7 @@ export default {
     // Save vouch
     vouchData.vouches.push({
       userId: interaction.user.id,
-      service: serviceName,
+      service: resolvedServiceName,
       rating,
       text,
       vouchNumber,
