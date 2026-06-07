@@ -6,8 +6,8 @@ export default {
     .setName('vouch')
     .setDescription('Submit a vouch for a service')
     .addStringOption(option =>
-      option.setName('service')
-        .setDescription('Service name')
+      option.setName('cheat')
+        .setDescription('Select a cheat')
         .setRequired(true)
         .setAutocomplete(true))
     .addIntegerOption(option =>
@@ -29,7 +29,7 @@ export default {
 
   async autocomplete(interaction) {
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-    const focused = interaction.options.getFocused();
+    const focused = interaction.options.getFocused('cheat') ?? interaction.options.getFocused();
     const services = config.services.map(s => s.name);
     const filtered = services.filter(s =>
       s.toLowerCase().includes(focused.toLowerCase())
@@ -42,7 +42,7 @@ export default {
 
   async execute(interaction) {
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
-    const serviceName = interaction.options.getString('service');
+    const serviceName = interaction.options.getString('cheat');
     const rating = interaction.options.getInteger('rating');
     const text = interaction.options.getString('text');
 
