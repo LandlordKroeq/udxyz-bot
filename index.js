@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import http from 'http';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -62,3 +63,11 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
+// Keep-alive HTTP server for UptimeRobot
+http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('Bot is running!');
+}).listen(5000, '0.0.0.0', () => {
+  console.log('🌐 Keep-alive server running on port 5000');
+});
