@@ -23,6 +23,10 @@ client.once('ready', () => {
   console.log(`📝 Loaded ${client.commands.size} commands`);
 });
 
+client.on('error', (error) => {
+  console.error('Client error:', error);
+});
+
 client.on('interactionCreate', async (interaction) => {
   if (interaction.isAutocomplete()) {
     const command = client.commands.get(interaction.commandName);
@@ -44,11 +48,15 @@ client.on('interactionCreate', async (interaction) => {
     await command.execute(interaction);
   } catch (error) {
     console.error(error);
-    const reply = { content: 'There was an error executing this command!', ephemeral: true };
-    if (interaction.replied || interaction.deferred) {
-      await interaction.followUp(reply);
-    } else {
-      await interaction.reply(reply);
+    try {
+      const reply = { content: 'There was an error executing this command!', ephemeral: true };
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(reply);
+      } else {
+        await interaction.reply(reply);
+      }
+    } catch (replyError) {
+      console.error('Failed to send error reply:', replyError);
     }
   }
 });
