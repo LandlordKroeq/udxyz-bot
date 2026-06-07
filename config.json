@@ -4,5 +4,9 @@
   "allowedRoles": [
     "1512157714975952979"
   ],
-  "services": []
+  "services": [
+    {
+      "name": "Fn"
+    }
+  ]
 }
