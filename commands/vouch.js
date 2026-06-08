@@ -1,5 +1,6 @@
 import { SlashCommandBuilder, EmbedBuilder } from 'discord.js';
 import fs from 'fs';
+import { getNextVouchNumber, addVouch } from '../db.js';
 
 export default {
   data: new SlashCommandBuilder()
@@ -42,7 +43,6 @@ export default {
   },
 
   async execute(interaction) {
-    // Claim the interaction immediately to prevent double-acknowledge errors
     await interaction.deferReply({ ephemeral: true });
 
     const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
@@ -66,25 +66,28 @@ export default {
     }
     const resolvedServiceName = matchedService.name;
 
-    // Load vouches
-    let vouchData = JSON.parse(fs.readFileSync('./vouches.json', 'utf8'));
-    const vouchNumber = vouchData.vouches.length + 1;
+    // Get next vouch number from DB
+    const vouchNumber = await getNextVouchNumber();
+    const timestamp = Date.now();
 
-    // Create stars with empty slots
+    // Save to DB
+    await addVouch({
+      userId: interaction.user.id,
+      service: resolvedServiceName,
+      rating,
+      text,
+      vouchNumber,
+      timestamp
+    });
+
+    // Build embed
     const stars = '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
-
-    // Color based on rating
     const color = rating >= 4 ? '#57F287' : rating === 3 ? '#FEE75C' : '#ED4245';
-
-    // Format timestamp
     const now = new Date();
     const date = now.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
     const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-
-    // User avatar
     const avatarURL = interaction.user.displayAvatarURL({ size: 256 });
 
-    // Create embed
     const embed = new EmbedBuilder()
       .setTitle(`${resolvedServiceName} Vouch`)
       .setDescription(`${stars}\n\n${text}`)
@@ -103,17 +106,6 @@ export default {
     if (channel) {
       await channel.send({ embeds: [embed] });
     }
-
-    // Save vouch
-    vouchData.vouches.push({
-      userId: interaction.user.id,
-      service: resolvedServiceName,
-      rating,
-      text,
-      vouchNumber,
-      timestamp: Date.now()
-    });
-    fs.writeFileSync('./vouches.json', JSON.stringify(vouchData, null, 2));
 
     await interaction.editReply({ content: '✅ Your vouch has been submitted!' });
   }

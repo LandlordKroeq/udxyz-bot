@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import http from 'http';
+import { initDb } from './db.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -61,6 +62,10 @@ client.on('interactionCreate', async (interaction) => {
     }
   }
 });
+
+// Init DB then login
+await initDb();
+console.log('🗄️ Database ready');
 
 client.login(process.env.DISCORD_TOKEN);
 
